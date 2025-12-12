@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PRNG Game</title>
+<style>
+body { font-family: Arial; text-align:center; margin-top:40px; }
+.box { font-size:60px; padding:20px; display:inline-block; border:2px solid #000; margin:10px; }
+#timer { font-size:40px; margin-top:20px; }
+</style>
+</head>
+<body>
+<h2>PRNG Game</h2>
+<div id="digit" class="box">-</div>
+<div id="type" class="box">-</div>
+<div id="color" class="box">-</div>
+<div id="timer"></div>
+
+<script>
+async function fetchDigit(){
+  const r = await fetch('/result');
+  const j = await r.json();
+  return j.digit;
+}
+
+function mapType(d){
+  return d<=4 ? "SMALL" : "BIG";
+}
+
+function mapColor(d){
+  if(d===0) return "VIOLET + RED";
+  if(d===5) return "VIOLET + GREEN";
+  return d%2===0 ? "RED" : "GREEN";
+}
+
+async function loop(){
+  const now = new Date();
+  const sec = now.getSeconds();
+  const remaining = 60 - sec;
+  document.getElementById('timer').innerHTML = "Next lock in: " + remaining + "s";
+
+  if(sec === 20){
+    const d = await fetchDigit();
+    document.getElementById('digit').innerHTML = d;
+    document.getElementById('type').innerHTML = mapType(d);
+    document.getElementById('color').innerHTML = mapColor(d);
+  }
+
+  if(sec === 0){
+    const d = await fetchDigit();
+    document.getElementById('digit').innerHTML = d;
+    document.getElementById('type').innerHTML = mapType(d);
+    document.getElementById('color').innerHTML = mapColor(d);
+  }
+
+  setTimeout(loop, 200);
+}
+loop();
+</script>
+
+</body>
+</html>
